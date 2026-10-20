@@ -1,4 +1,4 @@
-/* DiagCore 1.0.0 - extraction minimale du moteur DiagTree (C² D3-01/D3-02). */
+/* DiagCore 1.1.0 - extraction minimale du moteur DiagTree (C² D3-01/D3-02). */
 (function(global){
   'use strict';
   function mount(container, nodes, options){
@@ -15,7 +15,7 @@
     if(opts.theme==='light'||opts.theme==='dark')root.dataset.diagcoreTheme=opts.theme;
     root.replaceChildren();
     const header=document.createElement('header');header.className='diagcore__head';
-    const brand=document.createElement('b');brand.className='diagcore__brand';brand.textContent=opts.brand||'DiagCore';
+    const brand=document.createElement('b');brand.className='diagcore__brand';brand.textContent=opts.brand||'Diagnostic';
     const subtitle=document.createElement('span');subtitle.className='diagcore__subtitle';subtitle.textContent=opts.subtitle||labels.subtitle;
     header.append(brand,subtitle);
     const body=document.createElement('div');body.className='diagcore__body';
@@ -69,5 +69,5 @@
     render('start');
     return {restart:()=>{state.history=[];render('start');},goTo:id=>render(id),getHistory:()=>[...state.history],destroy:()=>root.replaceChildren()};
   }
-  global.DiagCore=Object.freeze({version:'1.0.0',mount});
+  global.DiagCore=Object.freeze({version:'1.1.0',mount});
 })(window);
