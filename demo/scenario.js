@@ -22,7 +22,7 @@
  const descriptions={ip:'IP : 169.254.18.27/16, pas de bail DHCP.',server:'Serveur : service DHCP actif.',relay:'Relais : destination DHCP absente sur le VLAN.',fixed:'Correction : relais DHCP configuré.',retest:'Retest : bail 192.168.20.42/24 obtenu.'};
  const result=document.querySelector('#result');
  const app=DiagCore.mount('#diagnostic',nodes,{
-  subtitle:'Incident DHCP · Poste utilisateur',onComplete:()=>{result.textContent='Diagnostic terminé et vérifié.';},
+  brand:'Diagnostic DHCP',subtitle:'Poste utilisateur',onComplete:()=>{result.textContent='Diagnostic terminé et vérifié.';},
   onStep:({id})=>{result.textContent=id==='done'?'Tu peux terminer le diagnostic.':'';}
  });
  document.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('click',()=>{
