@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DiagCore - Exemple vertical générique</title>
+<link rel="stylesheet" href="../v1/diagcore.css">
+<style>body{max-width:760px;margin:24px auto;padding:0 14px;background:#edf3f9;font:16px/1.5 system-ui,sans-serif;color:#18304a}@media(prefers-color-scheme:dark){body{background:#111c2a;color:#eef4fb}}button.reset{margin:16px 0;padding:10px;border-radius:8px}</style></head>
+<body>
+<h1>Exemple minimal : diagnostic vertical</h1>
+<p>Les contrôles et leurs résultats sont définis dans le scénario, indépendamment du moteur.</p>
+<div id="diagnostic"></div><button class="reset" id="restart" type="button">Recommencer</button>
+<script src="../v1/diagcore.js"></script>
+<script>
+const scenario={
+ title:'Choisis une vérification',minimumChecks:1,
+ groups:[
+  {title:'Poste',checks:[
+   {id:'ip',label:'Consulter la configuration IP',action:'Commande : ipconfig /all',observation:{type:'command',text:'IPv4 : 169.254.10.3\nPasserelle : absente'}}
+  ]},
+  {title:'Infrastructure',checks:[
+   {id:'service',label:'Contrôler le serveur',observation:{type:'text',text:'Le service est démarré.'}},
+   {id:'relay',label:'Contrôler le relais',observation:{type:'command',text:'Relais : non configuré'}}
+  ]}
+ ],
+ hypotheses:[
+  {label:'Le relais n’est pas configuré',correct:true,requiredChecks:['service','relay'],prematureFeedback:'Contrôle le serveur et le relais avant de conclure.'},
+  {label:'Le DNS est arrêté',correct:false,feedback:'Ce diagnostic ne correspond pas aux éléments observés.'}
+ ],
+ correction:{label:'Configurer le relais',requiredChecks:['service','relay'],observation:'Relais configuré.'},
+ verification:{label:'Renouveler la configuration IP',observation:{type:'command',text:'IPv4 : 192.168.20.15\nPasserelle : 192.168.20.1'}},
+ success:'La correction a été vérifiée.'
+};
+let app=DiagCore.mount('#diagnostic',scenario,{mode:'vertical'});
+document.querySelector('#restart').addEventListener('click',()=>app.restart());
+</script></body></html>
