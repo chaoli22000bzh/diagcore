@@ -2,7 +2,7 @@
 
 Moteur de diagnostic pédagogique autonome, extraction minimale de la logique de **DiagTree** (C²). Aucun fichier de C² n'a été modifié.
 
-## Version initiale 1.0.0
+## Version 1.1.0 (harmonisation visuelle)
 
 - `v1/diagcore.js` : navigation, embranchements, historique, retour, redémarrage, vérification via `check()` et fin de parcours.
 - `v1/diagcore.css` : styles de DiagTree isolés et préfixés, interface responsive, thèmes clair et sombre.
@@ -34,6 +34,8 @@ DiagCore.mount('#mon-diagnostic',nodes,{onComplete:()=>console.log('Diagnostic t
 Les attributs historiques de DiagTree sont conservés : `title`, `text`, `choices`, `next`, `check`, `fail`, `returnToTp`. Pour un nouveau scénario, préférer `complete:true`. Les contrôles restent des fonctions JavaScript : pas de conversion JSON obligatoire.
 
 ## Thèmes et isolation
+
+L'en-tête affiche un nom pédagogique configurable avec l'option `brand` (par exemple `brand:'Diagnostic DHCP'`). Le moteur utilise « Diagnostic » par défaut. Les règles de navigation et de progression sont inchangées.
 
 Les styles sont préfixés `.diagcore` ou `.diagcore__...` et n'affectent pas le reste des cours. Le thème suit `prefers-color-scheme` par défaut ; l'option `theme:'light'` ou `theme:'dark'` le force. Les couleurs principales peuvent être personnalisées par les variables CSS `--dc-bg`, `--dc-surface`, `--dc-text`, `--dc-muted`, `--dc-border`, `--dc-hover`. Définir les surcharges avec une spécificité suffisante pour les thèmes automatiques.
 
