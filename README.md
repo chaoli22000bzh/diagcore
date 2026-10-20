@@ -2,7 +2,7 @@
 
 Moteur de diagnostic pédagogique autonome, extraction minimale de la logique de **DiagTree** (C²). Aucun fichier de C² n'a été modifié.
 
-## Version 1.1.0 (harmonisation visuelle)
+## Version 1.2.0 (mode vertical facultatif)
 
 - `v1/diagcore.js` : navigation, embranchements, historique, retour, redémarrage, vérification via `check()` et fin de parcours.
 - `v1/diagcore.css` : styles de DiagTree isolés et préfixés, interface responsive, thèmes clair et sombre.
@@ -38,6 +38,42 @@ Les attributs historiques de DiagTree sont conservés : `title`, `text`, `choice
 L'en-tête affiche un nom pédagogique configurable avec l'option `brand` (par exemple `brand:'Diagnostic DHCP'`). Le moteur utilise « Diagnostic » par défaut. Les règles de navigation et de progression sont inchangées.
 
 Les styles sont préfixés `.diagcore` ou `.diagcore__...` et n'affectent pas le reste des cours. Le thème suit `prefers-color-scheme` par défaut ; l'option `theme:'light'` ou `theme:'dark'` le force. Les couleurs principales peuvent être personnalisées par les variables CSS `--dc-bg`, `--dc-surface`, `--dc-text`, `--dc-muted`, `--dc-border`, `--dc-hover`. Définir les surcharges avec une spécificité suffisante pour les thèmes automatiques.
+
+
+## Mode vertical optionnel (1.2.0)
+
+Le mode classique reste celui par défaut. Pour activer le parcours vertical, utiliser `mode:'vertical'` avec un scénario déclarant des groupes de contrôles.
+
+[Exemple générique vertical](https://chaoli22000bzh.github.io/diagcore/demo/vertical.html)
+
+```js
+const scenario = {
+  title:'Choisis une vérification',
+  minimumChecks:1,
+  groups:[{title:'Poste',checks:[
+    {id:'ip',label:'Consulter la configuration IPv4',
+     action:'Commande : ipconfig /all',
+     observation:{type:'command',text:'IPv4 : 169.254.10.3'}}
+  ]}],
+  hypotheses:[{label:'Absence de réponse DHCP',correct:true,requiredChecks:['ip']}],
+  correction:{label:'Appliquer une correction',requiredChecks:['ip'],observation:'Correction appliquée'},
+  verification:{label:'Retester le poste',check:()=>true,observation:'Bail DHCP reçu'},
+  success:'Diagnostic terminé.'
+};
+DiagCore.mount('#diagnostic',scenario,{mode:'vertical'});
+```
+
+**Contrats principaux :**
+
+- `groups[].checks[]` définit les contrôles par équipement ou catégorie. Chaque contrôle possède `id`, `label`, une éventuelle `action` et `observation`, qui peut être une valeur ou une fonction `observe({completed})`.
+- `observation` accepte du texte, `{type:'text',text}`, `{type:'command',text}`, `{type:'image',src,alt,caption}`, ou un tableau de ces blocs. Les images sont fournies par le scénario.
+- `minimumChecks` limite l'accès aux hypothèses. `hypotheses[]` définit `label`, `correct`, `requiredChecks`, `feedback`, `prematureFeedback`.
+- `correction` et `verification` sont indépendantes du DHCP. Leurs libellés et observations sont configurables. `verification.check({completed})` peut refuser une validation finale.
+- La timeline s'allonge vers le bas ; le contrôle et son résultat sont affichés ensemble. Les hypothèses erronées permettent de reprendre l'exploration.
+- `onComplete` fonctionne aussi en mode vertical. L'instance expose `restart()`, `getHistory()`, `getCompleted()`, `destroy()`.
+- Le mode vertical ne modifie ni les scénarios classiques ni les TP C².
+
+**Limites de la première extraction :** un contrôle est simulé par les observations fournies dans le scénario et est enregistré dès qu'il est sélectionné. Pour une vérification technique réelle, employer un adaptateur spécifique via `observe` et `verification.check`. Aucune commande réseau réelle n'est exécutée depuis le navigateur.
 
 ## Périmètre actuel
 
