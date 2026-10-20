@@ -106,7 +106,7 @@
       timeline.append(article);
       state.history.push({type,title});
     }
-    function scroll(){requestAnimationFrame(()=>next.scrollIntoView({behavior:'smooth',block:'end'}));}
+    function scroll(observation=false){const target=observation?timeline.lastElementChild:next;if(target)requestAnimationFrame(()=>target.scrollIntoView({behavior:'smooth',block:'start'}));}
     function hasRequired(arr){return (arr||[]).every(id=>state.done.has(id));}
     function show(){
       next.replaceChildren();
@@ -124,7 +124,7 @@
             state.done.add(c.id);
             const result=typeof c.observe==='function'?c.observe({completed:new Set(state.done)}):c.observation;
             addEntry('observation',c.label,[...(c.action?[{type:'text',text:c.action}]:[]),...(Array.isArray(result)?result:[result])]);
-            show();scroll();
+            show();scroll(true);
           });
           next.append(sec);
         }
