@@ -66,3 +66,9 @@
 .diagcore--vertical .diagcore__figure figcaption{color:var(--dc-muted);font-size:.85rem;margin-top:5px}
 .diagcore--vertical .diagcore__complete{margin:0;font-weight:700}
 @media(max-width:600px){.diagcore--vertical .diagcore__next{padding:12px}.diagcore--vertical .diagcore__entry{padding:12px}}
+
+/* 1.2.1 : contrôles et catégories déjà consultés, toujours actifs. */
+.diagcore--vertical .diagcore__choice--visited{background:#7eb9dd;border-color:#5c9ac3;color:#102c40}
+.diagcore--vertical .diagcore__choice--visited:hover:not(:disabled){background:#96cae6;border-color:#5c9ac3}
+.diagcore--vertical[data-diagcore-theme="dark"] .diagcore__choice--visited{background:#578bab;border-color:#7ab2d1;color:#fff}
+@media(prefers-color-scheme:dark){.diagcore--vertical:not([data-diagcore-theme="light"]) .diagcore__choice--visited{background:#578bab;border-color:#7ab2d1;color:#fff}}
