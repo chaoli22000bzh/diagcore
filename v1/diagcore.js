@@ -1,4 +1,4 @@
-/* DiagCore 1.2.1 - extraction minimale du moteur DiagTree (C² D3-01/D3-02). */
+/* DiagCore 1.2.2 - extraction minimale du moteur DiagTree (C² D3-01/D3-02). */
 (function(global){
   'use strict';
   function mount(container, nodes, options){
@@ -99,8 +99,8 @@
         else parent.append(el('p',null,data.text||''));
       });
     }
-    function addEntry(type,title,observation){
-      const article=el('article','diagcore__entry diagcore__entry--'+type);
+    function addEntry(type,title,observation,extraClass=''){
+      const article=el('article','diagcore__entry diagcore__entry--'+type+(extraClass?' '+extraClass:''));
       article.append(el('h3',null,title));
       appendPart(article,observation);
       timeline.append(article);
@@ -162,7 +162,7 @@
         next.append(el('h2','diagcore__title',s.hypothesisTitle||'Quelle hypothèse retiens-tu ?'));
         for(const h of s.hypotheses||[])btn(next,h.label,()=>{
           const valid=Boolean(h.correct)&&hasRequired(h.requiredChecks);
-          addEntry(valid?'decision':'feedback',h.label,valid?(h.feedback||'Hypothèse retenue.'):(!h.correct?(h.feedback||'Cette hypothèse ne correspond pas aux faits observés.'):(h.prematureFeedback||'Certaines vérifications indispensables manquent.')));
+          addEntry(valid?'decision':'feedback',h.label,valid?(h.feedback||'Hypothèse retenue.'):(!h.correct?(h.feedback||'Cette hypothèse ne correspond pas aux faits observés.'):(h.prematureFeedback||'Certaines vérifications indispensables manquent.')),valid?'diagcore__entry--hypothesis-correct':'diagcore__entry--hypothesis-wrong');
           state.phase=valid?'correction':'checks';show();scroll();
         });
         btn(next,s.backLabel||'Poursuivre les contrôles',()=>{state.phase='checks';show();scroll();});
@@ -194,5 +194,5 @@
     return {restart:reset,getHistory:()=>[...state.history],getCompleted:()=>[...state.done],destroy:()=>root.replaceChildren()};
   }
 
-  global.DiagCore=Object.freeze({version:'1.2.1',mount});
+  global.DiagCore=Object.freeze({version:'1.2.2',mount});
 })(window);
