@@ -2,6 +2,10 @@
 
 Moteur de diagnostic pédagogique autonome, extraction minimale de la logique de **DiagTree** (C²). Aucun fichier de C² n'a été modifié.
 
+## Version 1.2.2 : résultats de Mon diagnostic
+
+Les résultats des hypothèses utilisent désormais les couleurs de QCMCore : bordure verte `#00d958` si l'hypothèse est validée et orange `#ff9900` si elle est erronée ou prématurée. Les fonds sont foncés pour assurer une lecture en blanc dans les thèmes clair et sombre. Le style est appliqué uniquement aux entrées de la phase `hypotheses` via les classes `diagcore__entry--hypothesis-correct` et `diagcore__entry--hypothesis-wrong`. Observations, corrections, retests, historique et validation restent inchangés. La famille `1.2.` est conservée pour la compatibilité avec Messagerie.
+
 ## Version 1.2.1 : navigation libre (mode vertical)
 
 - La version autonome a été réalignée sur la copie des portails pour conserver `groupPicker`, `hideHypothesisUntilReady`, le sélecteur de catégories et les styles associés.
