@@ -74,6 +74,6 @@
 @media(prefers-color-scheme:dark){.diagcore--vertical:not([data-diagcore-theme="light"]) .diagcore__choice--visited{background:#578bab;border-color:#7ab2d1;color:#fff}}
 
 /* 1.2.2 : couleurs QCMCore réservées aux résultats des hypothèses de Mon diagnostic. */
-.diagcore--vertical .diagcore__entry--hypothesis-correct{border:2px solid #00d958;border-left-width:5px;background:#145b35;color:#fff}
-.diagcore--vertical .diagcore__entry--hypothesis-wrong{border:2px solid #ff9900;border-left-width:5px;background:#754000;color:#fff}
+.diagcore--vertical .diagcore__entry--hypothesis-correct{border:2px solid #00d958;border-left-width:5px;background:#202a35;color:#fff}
+.diagcore--vertical .diagcore__entry--hypothesis-wrong{border:2px solid #ff9900;border-left-width:5px;background:#202a35;color:#fff}
 .diagcore--vertical .diagcore__entry--hypothesis-correct h3,.diagcore--vertical .diagcore__entry--hypothesis-correct p,.diagcore--vertical .diagcore__entry--hypothesis-wrong h3,.diagcore--vertical .diagcore__entry--hypothesis-wrong p{color:#fff}
