@@ -2,7 +2,18 @@
 
 Moteur de diagnostic pédagogique autonome, extraction minimale de la logique de **DiagTree** (C²). Aucun fichier de C² n'a été modifié.
 
-## Version 1.2.0 (mode vertical facultatif)
+## Version 1.2.1 : navigation libre (mode vertical)
+
+- La version autonome a été réalignée sur la copie des portails pour conserver `groupPicker`, `hideHypothesisUntilReady`, le sélecteur de catégories et les styles associés.
+- Un contrôle déjà consulté reste cliquable et peut afficher à nouveau son observation. Les catégories entièrement consultées restent actives.
+- Un bouton consulté est identifié par `.diagcore__choice--visited` (bleu clair, y compris en mode sombre).
+- `state.done` demeure un ensemble d'identifiants distincts : les répétitions ne gonflent pas `minimumChecks`, `requiredChecks` ni `getCompleted()`.
+- Chaque ouverture d'une observation ajoute une nouvelle entrée dans `getHistory()`. `restart()` efface historique, contrôles distincts et catégorie choisie.
+- La présentation historique sans `mode:'vertical'` n'est pas modifiée.
+
+**Intégration dans les portails :** lors d'une opération distincte, remplacer ensemble `ressources/diagcore/v1/diagcore.js` et `ressources/diagcore/v1/diagcore.css` par les fichiers homologues du dépôt autonome. Actualiser si nécessaire les paramètres de cache `?v=` des deux ressources dans les cours, sans toucher aux scripts de scénario. Le numéro `1.2.1` conserve volontairement la famille `1.2.` exigée par le scénario Messagerie actuel.
+
+## Version 1.2.1 (mode vertical facultatif)
 
 - `v1/diagcore.js` : navigation, embranchements, historique, retour, redémarrage, vérification via `check()` et fin de parcours.
 - `v1/diagcore.css` : styles de DiagTree isolés et préfixés, interface responsive, thèmes clair et sombre.
