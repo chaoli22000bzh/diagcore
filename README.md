@@ -2,6 +2,25 @@
 
 Moteur de diagnostic pédagogique autonome, extraction minimale de la logique de **DiagTree** (C²). Aucun fichier de C² n'a été modifié.
 
+## Version 1.3.0 : parcours multi-interventions (en cours de recette)
+
+**Nouvelle version disponible dans [v1.3/](v1.3/).** La V1.2.2 reste conservée dans `v1/` et n'est pas remplacée automatiquement dans les cours.
+
+- Plusieurs interventions successives, répétables, sans vérification obligatoire entre chacune.
+- Vérifications multiples réutilisant les contrôles existants, avec suivi des révisions techniques.
+- Échanges synchrones ou asynchrones avec les scénarios et simulateurs, sans dépendance à R2D3 ou Outlook.
+- Clôture demandée par l'élève et autorisée uniquement par le scénario.
+- Historique unique, boutons avec sous-titre et protection contre les résultats tardifs après redémarrage.
+
+**Ressources :**
+
+- [Contrat technique et documentation V1.3](v1.3/README.md)
+- [Moteur JavaScript V1.3](v1.3/diagcore.js) et [feuille CSS V1.3](v1.3/diagcore.css)
+- [Démonstrateur autonome](v1.3/demo.html)
+- [Page de tests automatiques](v1.3/tests.html)
+
+La syntaxe et huit tests comportementaux ont été vérifiés dans un environnement DOM simulé. La recette finale sur navigateurs PC et smartphone ainsi que l'intégration dans les cours restent à effectuer.
+
 ## Version 1.2.2 : résultats de Mon diagnostic
 
 Les résultats des hypothèses utilisent désormais les couleurs de QCMCore : bordure verte `#00d958` si l'hypothèse est validée et orange `#ff9900` si elle est erronée ou prématurée. Les fonds sont foncés pour assurer une lecture en blanc dans les thèmes clair et sombre. Le style est appliqué uniquement aux entrées de la phase `hypotheses` via les classes `diagcore__entry--hypothesis-correct` et `diagcore__entry--hypothesis-wrong`. Observations, corrections, retests, historique et validation restent inchangés. La famille `1.2.` est conservée pour la compatibilité avec Messagerie.
