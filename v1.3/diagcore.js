@@ -239,9 +239,9 @@
       return st.revision;
     }
     function context(){return {completed:new Set(st.done),revision:revision(),interventions:st.interventions.map(x=>({...x})),verifications:st.verifications.map(x=>({...x})),history:st.history.map(x=>({...x}))};}
-    function validResult(raw){
+    function validResult(raw,kind){
       if(raw&&typeof raw==='object'&&!Array.isArray(raw)&&('executed'in raw||'changed'in raw||'observation'in raw||'passed'in raw||'allowed'in raw))return raw;
-      return {executed:true,changed:false,observation:raw};
+      return {executed:kind!=='intervention',changed:false,observation:raw};
     }
     function updateRevision(result){
       if(result.revision!==undefined&&result.revision!==null){
@@ -282,7 +282,7 @@
         let output=typeof operation==='function'?operation(context()):operation;
         output=await output;
         if(st.destroyed||generation!==st.generation)return;
-        const r=validResult(output);
+        const r=validResult(output,kind);
         apply(kind,item,r);
       }catch(error){
         if(st.destroyed||generation!==st.generation)return;
@@ -298,10 +298,11 @@
         if(typeof s.canClose!=='function'){
           entry('feedback','Clôture refusée','Aucune condition de clôture définie par le scénario.',{kind:'close',allowed:false});return;
         }
+        const before=revision();
         const r=await s.canClose(context());
         if(st.destroyed||generation!==st.generation)return;
-        const allowed=r===true||(r&&r.allowed===true);
-        const message=r&&typeof r==='object'?r.feedback:undefined;
+        const allowed=(r===true||(r&&r.allowed===true))&&revision()===before;
+        const message=revision()!==before?'L’état technique a changé pendant la validation. Vérifie de nouveau.':(r&&typeof r==='object'?r.feedback:undefined);
         entry(allowed?'decision':'feedback',allowed?'Clôture acceptée':'Clôture refusée',message||(allowed?'Incident résolu et vérifié.':'Poursuis les vérifications avant de clôturer.'),{kind:'close',allowed});
         if(allowed)complete();else scroll();
       }catch(error){
@@ -384,7 +385,8 @@
       const item=kind==='intervention'?actions.find(x=>x.id===report.id):kind==='verification'?checks.find(x=>x.id===report.id):null;
       if(!item)return false;
       st.externalIds.add(id);
-      apply(kind,item,validResult(report.result));
+      if(!report.result||typeof report.result!=='object'||typeof report.result.executed!=='boolean')return false;
+      apply(kind,item,validResult(report.result,kind));
       return true;
     }
     function restart(){
