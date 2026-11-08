@@ -1,6 +1,7 @@
 /* DiagCore 1.3.0 - extraction minimale du moteur DiagTree (C² D3-01/D3-02). */
 (function(global){
   'use strict';
+  let generationCounter=0;
   function mount(container, nodes, options){
     if(options&&options.mode==='vertical')return Array.isArray(nodes&&nodes.interventions)?mountWorkflow(typeof container==='string'?document.querySelector(container):container,nodes,options):mountVertical(container,nodes,options);
     const root=typeof container==='string'?document.querySelector(container):container;
@@ -204,7 +205,7 @@
     if(!root)throw Error('DiagCore : conteneur introuvable');
     if(!actions.length||checks.some(c=>!c.id||!c.label)||actions.some(a=>!a.id||!a.label))throw Error('DiagCore : contrôles ou interventions invalides');
     if(new Set(checks.map(c=>c.id)).size!==checks.length||new Set(actions.map(a=>a.id)).size!==actions.length)throw Error('DiagCore : identifiants dupliqués');
-    const st={done:new Set(),history:[],phase:'checks',selectedGroup:null,revision:0,interventions:[],verifications:[],externalIds:new Set(),pending:false,generation:0,destroyed:false,diagnosis:null};
+    const st={done:new Set(),history:[],phase:'checks',selectedGroup:null,revision:0,interventions:[],verifications:[],externalIds:new Set(),pending:false,generation:++generationCounter,destroyed:false,diagnosis:null};
     root.classList.add('diagcore','diagcore--vertical');
     if(opts.theme==='light'||opts.theme==='dark')root.dataset.diagcoreTheme=opts.theme;
     root.replaceChildren();
@@ -256,7 +257,7 @@
       if(typeof opts.onComplete==='function')opts.onComplete(detail);
       root.dispatchEvent(new CustomEvent('diagcore:complete',{bubbles:true,detail}));
     }
-    function scroll(){const target=timeline.lastElementChild||next;if(target)requestAnimationFrame(()=>target.scrollIntoView({behavior:'smooth',block:'start'}));}
+    function scroll(){const target=timeline.lastElementChild||next,generation=st.generation;if(target)requestAnimationFrame(()=>{if(!st.destroyed&&generation===st.generation)target.scrollIntoView({behavior:'smooth',block:'start'});});}
     function apply(kind,item,result,external=false){
       updateRevision(result);
       const rev=revision();
@@ -390,12 +391,12 @@
       return true;
     }
     function restart(){
-      st.generation++;st.done.clear();st.history=[];st.phase='checks';st.selectedGroup=null;st.revision=0;st.interventions=[];st.verifications=[];st.externalIds.clear();st.diagnosis=null;st.pending=false;timeline.replaceChildren();show();
+      st.generation=++generationCounter;st.done.clear();st.history=[];st.phase='checks';st.selectedGroup=null;st.revision=0;st.interventions=[];st.verifications=[];st.externalIds.clear();st.diagnosis=null;st.pending=false;timeline.replaceChildren();show();
     }
     show();
     return {restart,getHistory:()=>st.history.map(x=>({...x})),getCompleted:()=>[...st.done],
       getRevision:revision,getGeneration:()=>st.generation,reportExternal,
-      destroy:()=>{st.generation++;st.destroyed=true;root.replaceChildren();}};
+      destroy:()=>{st.generation=++generationCounter;st.destroyed=true;root.replaceChildren();}};
   }
 
   global.DiagCore=Object.freeze({version:'1.3.0',mount});
