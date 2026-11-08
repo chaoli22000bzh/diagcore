@@ -70,6 +70,24 @@ const tests=[
   await click('Lire IPv4');await click('Formuler une hypothèse');await click('Panne DHCP');await click('Lire IPv4');
   btn('Demander la clôture').click();tech.revision++;finish({allowed:true,feedback:'Tentative'});await pause();
   assert(a.getHistory().at(-1).allowed===false,'Clôture acceptée avec une révision obsolète');a.destroy();
+ }],
+ ['Confirmation externe invalide puis corrigée',async()=>{
+  resetHost();const tech={on:false,revision:0},sc=base(tech,()=>({executed:true,changed:false,observation:'OK'}));
+  const a=DiagCore.mount(host,sc,{mode:'vertical'});
+  await click('Lire IPv4');await click('Formuler une hypothèse');await click('Panne DHCP');
+  const partial={generation:a.getGeneration(),operationId:'tentative-1',kind:'intervention',id:'start'};
+  assert(!a.reportExternal({...partial,result:{changed:true,observation:'Incomplet'}}),'Résultat incomplet accepté');
+  assert(a.reportExternal({...partial,result:{executed:true,changed:false,observation:'Corrigé'}}),'Identifiant consommé après refus');a.destroy();
+ }],
+ ['Intervention refusée sans progression de révision',async()=>{
+  resetHost();const tech={on:false,revision:0};
+  const sc=base(tech,()=>({executed:false,changed:true,revision:8,observation:'Accès refusé'}));
+  delete sc.getRevision;
+  const a=DiagCore.mount(host,sc,{mode:'vertical'});
+  await click('Lire IPv4');await click('Formuler une hypothèse');await click('Panne DHCP');await click('Démarrer DHCP');
+  const last=a.getHistory().at(-1);
+  assert(a.getRevision()===0,'Révision modifiée malgré refus');
+  assert(last.executed===false&&last.changed===false,'Résultat incohérent non normalisé');a.destroy();
  }]
 ];
 document.querySelector('#run').addEventListener('click',async()=>{
