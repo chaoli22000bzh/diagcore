@@ -4,7 +4,7 @@
 const tech={on:false,revision:0};let app;let sequence=0;
 const status=document.querySelector('#technical');
 function display(){status.textContent='Simulateur : DHCP '+(tech.on?'actif':'arrêté')+' | Révision '+tech.revision;}
-function ip(){return {type:'command',text:'IPv4 : '+(tech.on?'192.168.1.104':'169.254.12.8')+'\\nPasserelle : '+(tech.on?'192.168.1.1':'absente')};}
+function ip(){return {type:'command',text:'IPv4 : '+(tech.on?'192.168.1.104':'169.254.12.8')+'\nPasserelle : '+(tech.on?'192.168.1.1':'absente')};}
 const scenario={
  title:'Que contrôler ?',groupPicker:true,minimumChecks:1,hideHypothesisUntilReady:true,
  getRevision:()=>tech.revision,
