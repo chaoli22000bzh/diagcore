@@ -23,7 +23,7 @@ const tests=[
  ['Interventions répétées et contrôle récent',async()=>{
   resetHost();const tech={on:false,revision:0};let executions=0;
   const sc=base(tech,()=>{executions++;const changed=!tech.on;tech.on=true;if(changed)tech.revision++;return {executed:true,changed,observation:'Service démarré'};});
-  const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Lire IPv4');await click('Panne DHCP');
+  const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Lire IPv4');await click('Formuler une hypothèse');await click('Panne DHCP');
   await click('Démarrer DHCP');await click('Démarrer DHCP');assert(executions===2,'Répétition impossible');
   await click('Demander la clôture');assert(a.getHistory().at(-1).allowed===false,'Clôture prématurée acceptée');
   await click('Lire IPv4');await click('Demander la clôture');assert(a.getHistory().at(-1).allowed===true,'Clôture après vérification refusée');a.destroy();
@@ -31,14 +31,14 @@ const tests=[
  ['Résultat tardif après recommencement',async()=>{
   resetHost();const tech={on:false,revision:0};let resolve;
   const sc=base(tech,()=>new Promise(r=>{resolve=()=>{tech.on=true;tech.revision++;r({executed:true,changed:true,observation:'Terminé'});};}));
-  const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Lire IPv4');await click('Panne DHCP');btn('Démarrer DHCP').click();
+  const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Lire IPv4');await click('Formuler une hypothèse');await click('Panne DHCP');btn('Démarrer DHCP').click();
   const oldGeneration=a.getGeneration();a.restart();resolve();await pause();
   assert(a.getHistory().length===0,'Ancien résultat introduit dans historique');
   assert(a.getGeneration()!==oldGeneration,'Génération inchangée');assert(tech.on,'Le simulateur devait conserver son changement');a.destroy();
  }],
  ['Confirmation externe unique et destruction',async()=>{
   resetHost();const tech={on:true,revision:3};const sc=base(tech,()=>({executed:true,changed:false,observation:'Ok'}));
-  const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Lire IPv4');await click('Panne DHCP');
+  const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Lire IPv4');await click('Formuler une hypothèse');await click('Panne DHCP');
   const report={generation:a.getGeneration(),operationId:'ext-1',kind:'intervention',id:'start',result:{executed:true,changed:false,observation:'Confirmé'}};
   assert(a.reportExternal(report),'Première confirmation refusée');
   assert(!a.reportExternal(report),'Confirmation doublon acceptée');a.destroy();
@@ -47,7 +47,7 @@ const tests=[
  ['Double clic bloqué pendant opération',async()=>{
   resetHost();const tech={on:false,revision:0};let executions=0,resolve;
   const sc=base(tech,()=>{executions++;return new Promise(r=>{resolve=r});});
-  const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Lire IPv4');await click('Panne DHCP');
+  const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Lire IPv4');await click('Formuler une hypothèse');await click('Panne DHCP');
   const b=btn('Démarrer DHCP');b.click();b.click();assert(executions===1,'Double exécution');resolve({executed:true,changed:false,observation:'OK'});await pause();a.destroy();
  }]
 ];
