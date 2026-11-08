@@ -1,0 +1,62 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tests DiagCore V1.3</title><link rel="stylesheet" href="diagcore.css"><style>body{font:15px/1.5 system-ui;margin:20px;background:#f2f5f9;color:#1b2e42}main{max-width:880px;margin:auto}#fixture{position:absolute;left:-100000px;width:500px;top:0}li{margin:8px 0}.pass{color:#16723b}.fail{color:#b12c21}@media(prefers-color-scheme:dark){body{background:#131e2e;color:#f1f5ff}.pass{color:#76eea0}.fail{color:#ff978d}}</style></head><body><main><h1>DiagCore V1.3 : tests automatiques</h1><p>Les tests exécutent les scénarios dans le navigateur, sans serveur ni dépendances.</p><button id="run" type="button">Exécuter les tests</button><ol id="results" aria-live="polite"></ol><div id="fixture"></div></main><script src="diagcore.js"></script><script>
+(function(){
+'use strict';
+const out=document.querySelector('#results'),host=document.querySelector('#fixture');
+const pause=()=>new Promise(resolve=>setTimeout(resolve,0));
+const assert=(condition,message)=>{if(!condition)throw Error(message)};
+const btn=(text)=>{const b=[...host.querySelectorAll('button')].find(x=>x.textContent.includes(text));if(!b)throw Error('Bouton absent : '+text);return b;};
+const click=async text=>{btn(text).click();await pause();};
+const resetHost=()=>{host.replaceChildren();};
+const base=(tech,execute)=>({
+ title:'Contrôles',minimumChecks:1,groups:[{title:'PC',checks:[{id:'ip',label:'Lire IPv4',observe:()=>({executed:true,observation:tech.on?'IP correcte':'APIPA'}),verify:()=>({executed:true,observation:tech.on?'IP correcte':'APIPA',passed:tech.on})}]}],
+ hypotheses:[{label:'Panne DHCP',correct:true,requiredChecks:['ip']}],
+ interventions:[{id:'start',label:'Démarrer DHCP',execute}],
+ getRevision:()=>tech.revision,
+ canClose:ctx=>({allowed:tech.on&&ctx.verifications.some(v=>v.id==='ip'&&v.revision===ctx.revision),feedback:'Validation pédagogique'})
+});
+const tests=[
+ ['Compatibilité verticale 1.2.2',async()=>{
+  resetHost();const sc={title:'Contrôles',groups:[{title:'PC',checks:[{id:'ip',label:'Voir IPv4',observation:'APIPA'}]}],hypotheses:[{label:'DHCP',correct:true,requiredChecks:['ip']}],correction:{label:'Corriger',observation:'Modifié'},verification:{label:'Tester',check:()=>true,observation:'OK'}};
+  const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Voir IPv4');await click('DHCP');await click('Corriger');await click('Tester');
+  assert(a.getCompleted().length===1,'Comptage ancien perdu');a.destroy();
+ }],
+ ['Interventions répétées et contrôle récent',async()=>{
+  resetHost();const tech={on:false,revision:0};let executions=0;
+  const sc=base(tech,()=>{executions++;const changed=!tech.on;tech.on=true;if(changed)tech.revision++;return {executed:true,changed,observation:'Service démarré'};});
+  const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Lire IPv4');await click('Panne DHCP');
+  await click('Démarrer DHCP');await click('Démarrer DHCP');assert(executions===2,'Répétition impossible');
+  await click('Demander la clôture');assert(a.getHistory().at(-1).allowed===false,'Clôture prématurée acceptée');
+  await click('Lire IPv4');await click('Demander la clôture');assert(a.getHistory().at(-1).allowed===true,'Clôture après vérification refusée');a.destroy();
+ }],
+ ['Résultat tardif après recommencement',async()=>{
+  resetHost();const tech={on:false,revision:0};let resolve;
+  const sc=base(tech,()=>new Promise(r=>{resolve=()=>{tech.on=true;tech.revision++;r({executed:true,changed:true,observation:'Terminé'});};}));
+  const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Lire IPv4');await click('Panne DHCP');btn('Démarrer DHCP').click();
+  const oldGeneration=a.getGeneration();a.restart();resolve();await pause();
+  assert(a.getHistory().length===0,'Ancien résultat introduit dans historique');
+  assert(a.getGeneration()!==oldGeneration,'Génération inchangée');assert(tech.on,'Le simulateur devait conserver son changement');a.destroy();
+ }],
+ ['Confirmation externe unique et destruction',async()=>{
+  resetHost();const tech={on:true,revision:3};const sc=base(tech,()=>({executed:true,changed:false,observation:'Ok'}));
+  const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Lire IPv4');await click('Panne DHCP');
+  const report={generation:a.getGeneration(),operationId:'ext-1',kind:'intervention',id:'start',result:{executed:true,changed:false,observation:'Confirmé'}};
+  assert(a.reportExternal(report),'Première confirmation refusée');
+  assert(!a.reportExternal(report),'Confirmation doublon acceptée');a.destroy();
+  assert(!a.reportExternal({...report,operationId:'ext-2'}),'Instance détruite encore active');
+ }],
+ ['Double clic bloqué pendant opération',async()=>{
+  resetHost();const tech={on:false,revision:0};let executions=0,resolve;
+  const sc=base(tech,()=>{executions++;return new Promise(r=>{resolve=r});});
+  const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Lire IPv4');await click('Panne DHCP');
+  const b=btn('Démarrer DHCP');b.click();b.click();assert(executions===1,'Double exécution');resolve({executed:true,changed:false,observation:'OK'});await pause();a.destroy();
+ }]
+];
+document.querySelector('#run').addEventListener('click',async()=>{
+ out.replaceChildren();for(const [name,test] of tests){
+  const li=document.createElement('li');try{await test();li.className='pass';li.textContent='OK : '+name;}
+  catch(e){li.className='fail';li.textContent='ÉCHEC : '+name+' ('+e.message+')';}
+  out.append(li);
+ }host.replaceChildren();
+});
+})();
+</script></body></html>
