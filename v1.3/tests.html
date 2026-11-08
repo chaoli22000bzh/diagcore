@@ -49,6 +49,27 @@ const tests=[
   const sc=base(tech,()=>{executions++;return new Promise(r=>{resolve=r});});
   const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Lire IPv4');await click('Formuler une hypothèse');await click('Panne DHCP');
   const b=btn('Démarrer DHCP');b.click();b.click();assert(executions===1,'Double exécution');resolve({executed:true,changed:false,observation:'OK'});await pause();a.destroy();
+ }],
+ ['Mode DiagTree historique',async()=>{
+  resetHost();let completed=0;
+  const nodes={start:{title:'Départ',text:'Choisir',choices:[['done','Continuer']]},done:{title:'Résolu',text:'Panne réparée',complete:true}};
+  const a=DiagCore.mount(host,nodes,{onComplete:()=>{completed++}});
+  await click('Continuer');await click('Terminer le diagnostic');
+  assert(completed===1,'Événement de fin historique absent');a.destroy();
+ }],
+ ['Générations uniques entre instances',async()=>{
+  resetHost();const tech={on:false,revision:0};const sc=base(tech,()=>({executed:true,changed:false,observation:'OK'}));
+  const a=DiagCore.mount(host,sc,{mode:'vertical'}),old=a.getGeneration();a.destroy();
+  const b=DiagCore.mount(host,sc,{mode:'vertical'});assert(b.getGeneration()!==old,'Collision de générations entre instances');b.destroy();
+ }],
+ ['Clôture invalidée si révision change',async()=>{
+  resetHost();const tech={on:true,revision:1};let finish;
+  const sc=base(tech,()=>({executed:true,changed:false,observation:'OK'}));
+  sc.canClose=()=>new Promise(resolve=>{finish=resolve;});
+  const a=DiagCore.mount(host,sc,{mode:'vertical'});
+  await click('Lire IPv4');await click('Formuler une hypothèse');await click('Panne DHCP');await click('Lire IPv4');
+  btn('Demander la clôture').click();tech.revision++;finish({allowed:true,feedback:'Tentative'});await pause();
+  assert(a.getHistory().at(-1).allowed===false,'Clôture acceptée avec une révision obsolète');a.destroy();
  }]
 ];
 document.querySelector('#run').addEventListener('click',async()=>{
