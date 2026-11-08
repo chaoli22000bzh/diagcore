@@ -64,7 +64,7 @@ const accepted = app.reportExternal({
 
 ## Démonstrateur et limites
 
-Le démonstrateur `v1.3/demo.html` propose des actions exécutées sans changement, des modifications, des refus, des vérifications, une clôture et un appel externe. Il emploie un simulateur fictif intégré à la page. Une recette indépendante sur navigateurs PC et mobiles reste nécessaire avant intégration.
+Le démonstrateur `v1.3/demo.html` propose des actions exécutées sans changement, des modifications, des refus, des vérifications, une clôture et un appel externe. Il emploie un simulateur fictif intégré à la page. Le 8 novembre 2026, les dix tests de `tests.html` ont été exécutés avec succès dans un DOM simulé, après correction des confirmations externes invalides et des révisions d'interventions refusées. Cela ne constitue pas une validation sur navigateur réel. La recette visuelle et tactile sur PC et smartphone reste obligatoire avant intégration.
 
 Non inclus : sauvegarde persistante, R2D3 intégré, bibliothèque de simulateurs, nouveau mode graphique, notation, état technique interne.
 
