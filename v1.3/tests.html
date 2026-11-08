@@ -17,7 +17,7 @@ const base=(tech,execute)=>({
 const tests=[
  ['Compatibilité verticale 1.2.2',async()=>{
   resetHost();const sc={title:'Contrôles',groups:[{title:'PC',checks:[{id:'ip',label:'Voir IPv4',observation:'APIPA'}]}],hypotheses:[{label:'DHCP',correct:true,requiredChecks:['ip']}],correction:{label:'Corriger',observation:'Modifié'},verification:{label:'Tester',check:()=>true,observation:'OK'}};
-  const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Voir IPv4');await click('DHCP');await click('Corriger');await click('Tester');
+  const a=DiagCore.mount(host,sc,{mode:'vertical'});await click('Voir IPv4');await click('Formuler une hypothèse');await click('DHCP');await click('Corriger');await click('Tester');
   assert(a.getCompleted().length===1,'Comptage ancien perdu');a.destroy();
  }],
  ['Interventions répétées et contrôle récent',async()=>{
