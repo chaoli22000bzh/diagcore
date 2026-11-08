@@ -241,7 +241,10 @@
     }
     function context(){return {completed:new Set(st.done),revision:revision(),interventions:st.interventions.map(x=>({...x})),verifications:st.verifications.map(x=>({...x})),history:st.history.map(x=>({...x}))};}
     function validResult(raw,kind){
-      if(raw&&typeof raw==='object'&&!Array.isArray(raw)&&('executed'in raw||'changed'in raw||'observation'in raw||'passed'in raw||'allowed'in raw))return {...raw,executed:typeof raw.executed==='boolean'?raw.executed:kind!=='intervention'};
+      if(raw&&typeof raw==='object'&&!Array.isArray(raw)&&('executed'in raw||'changed'in raw||'observation'in raw||'passed'in raw||'allowed'in raw)){
+        const executed=typeof raw.executed==='boolean'?raw.executed:kind!=='intervention';
+        return {...raw,executed,changed:executed&&raw.changed===true};
+      }
       return {executed:kind!=='intervention',changed:false,observation:raw};
     }
     function updateRevision(result){
@@ -259,7 +262,7 @@
     }
     function scroll(){const target=timeline.lastElementChild||next,generation=st.generation;if(target)requestAnimationFrame(()=>{if(!st.destroyed&&generation===st.generation)target.scrollIntoView({behavior:'smooth',block:'start'});});}
     function apply(kind,item,result,external=false){
-      updateRevision(result);
+      if(result.executed===true&&result.changed===true)updateRevision(result);
       const rev=revision();
       const name=item.label||item.id;
       const observation=result.observation!==undefined?result.observation:(result.executed===false?'Opération non exécutée.':'Opération terminée.');
@@ -385,8 +388,8 @@
       const kind=report.kind;
       const item=kind==='intervention'?actions.find(x=>x.id===report.id):kind==='verification'?checks.find(x=>x.id===report.id):null;
       if(!item)return false;
-      st.externalIds.add(id);
       if(!report.result||typeof report.result!=='object'||typeof report.result.executed!=='boolean')return false;
+      st.externalIds.add(id);
       apply(kind,item,validResult(report.result,kind));
       return true;
     }
