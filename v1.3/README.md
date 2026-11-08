@@ -68,6 +68,8 @@ Le démonstrateur `v1.3/demo.html` propose des actions exécutées sans changeme
 
 Non inclus : sauvegarde persistante, R2D3 intégré, bibliothèque de simulateurs, nouveau mode graphique, notation, état technique interne.
 
+[Exécuter les tests automatisés dans un navigateur](./tests.html). Ces tests incluent la compatibilité V1.2.2, la clôture, les générations et les confirmations externes. Ils restent à exécuter dans les navigateurs cibles.
+
 ## Contrôles de validation à exécuter
 
 1. Scénarios historiques V1.2.2 inchangés, mode classique et vertical.
