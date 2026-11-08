@@ -241,7 +241,7 @@
     }
     function context(){return {completed:new Set(st.done),revision:revision(),interventions:st.interventions.map(x=>({...x})),verifications:st.verifications.map(x=>({...x})),history:st.history.map(x=>({...x}))};}
     function validResult(raw,kind){
-      if(raw&&typeof raw==='object'&&!Array.isArray(raw)&&('executed'in raw||'changed'in raw||'observation'in raw||'passed'in raw||'allowed'in raw))return raw;
+      if(raw&&typeof raw==='object'&&!Array.isArray(raw)&&('executed'in raw||'changed'in raw||'observation'in raw||'passed'in raw||'allowed'in raw))return {...raw,executed:typeof raw.executed==='boolean'?raw.executed:kind!=='intervention'};
       return {executed:kind!=='intervention',changed:false,observation:raw};
     }
     function updateRevision(result){
