@@ -1,6 +1,6 @@
 # DiagCore V1.3.0 : contrat et recette
 
-Statut : prototype publié pour validation fonctionnelle. Le répertoire v1/ (1.2.2) est intact. La migration des cours est distincte.
+Statut : version 1.3.0 de référence pour les cours. Le répertoire `v1/` (1.2.2) est conservé comme archive technique. Les références de chargement du portail ont été vérifiées sur `main`, y compris les pages DHCP.
 
 ## Activation
 
@@ -64,7 +64,7 @@ const accepted = app.reportExternal({
 
 ## Démonstrateur et limites
 
-Le démonstrateur `v1.3/demo.html` propose des actions exécutées sans changement, des modifications, des refus, des vérifications, une clôture et un appel externe. Il emploie un simulateur fictif intégré à la page. Le 8 novembre 2026, les dix tests de `tests.html` ont été exécutés avec succès dans un DOM simulé, après correction des confirmations externes invalides et des révisions d'interventions refusées. Cela ne constitue pas une validation sur navigateur réel. La recette visuelle et tactile sur PC et smartphone reste obligatoire avant intégration.
+Le démonstrateur `v1.3/demo.html` propose des actions exécutées sans changement, des modifications, des refus, des vérifications, une clôture et un appel externe. Il emploie un simulateur fictif intégré à la page. Dix tests de `tests.html` ont été exécutés avec succès dans un DOM simulé, après correction des confirmations externes invalides et des révisions d'interventions refusées. Le démonstrateur a également été validé lors d'un essai utilisateur. Ces résultats ne certifient pas chaque navigateur et chaque intégration réelle avec R2D3 ou Outlook.
 
 Non inclus : sauvegarde persistante, R2D3 intégré, bibliothèque de simulateurs, nouveau mode graphique, notation, état technique interne.
 
@@ -81,4 +81,4 @@ Non inclus : sauvegarde persistante, R2D3 intégré, bibliothèque de simulateur
 7. Redémarrage/destroy pendant une opération asynchrone : résultat tardif ignoré par DiagCore.
 8. Test smartphone, contraste, sous-titres, clavier et terminaux longs.
 
-Ne pas remplacer v1/ ni les références des cours sans recette validée.
+Politique actuelle : utiliser uniquement `v1.3/diagcore.js` avec `v1.3/diagcore.css` dans les cours. Ne pas charger une seconde version dans une même page : les versions exposent toutes `window.DiagCore`. Les anciennes copies restent archivées, sans nouvelle intégration.
