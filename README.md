@@ -1,116 +1,66 @@
 # DiagCore
 
-Moteur de diagnostic pédagogique autonome, extraction minimale de la logique de **DiagTree** (C²). Aucun fichier de C² n'a été modifié.
+Moteur pédagogique autonome de diagnostic et de dépannage, en JavaScript et CSS, destiné aux cours DHCP, DNS, Messagerie et Incidents.
 
-## Version 1.3.0 : parcours multi-interventions (en cours de recette)
+## Version de référence : DiagCore 1.3.0
 
-**Nouvelle version disponible dans [v1.3/](v1.3/).** La V1.2.2 reste conservée dans `v1/` et n'est pas remplacée automatiquement dans les cours.
+**La V1.3 est désormais la seule version recommandée pour les cours et les nouvelles intégrations.** Les cours du portail pédagogique ont été migrés vers cette version, y compris le diagnostic principal DHCP et sa page historique de test (vérification des références dans la branche `main`).
 
-- Plusieurs interventions successives, répétables, sans vérification obligatoire entre chacune.
-- Vérifications multiples réutilisant les contrôles existants, avec suivi des révisions techniques.
-- Échanges synchrones ou asynchrones avec les scénarios et simulateurs, sans dépendance à R2D3 ou Outlook.
-- Clôture demandée par l'élève et autorisée uniquement par le scénario.
-- Historique unique, boutons avec sous-titre et protection contre les résultats tardifs après redémarrage.
+Le moteur peut fonctionner avec les scénarios historiques de la V1.2.2 sans imposer leur conversion. Un scénario qui déclare `interventions` active le nouveau parcours multi-interventions.
 
-**Ressources :**
+### Ressources officielles
 
-- [Contrat technique et documentation V1.3](v1.3/README.md)
-- [Moteur JavaScript V1.3](v1.3/diagcore.js) et [feuille CSS V1.3](v1.3/diagcore.css)
-- [Démonstrateur autonome](v1.3/demo.html)
-- [Page de tests automatiques](v1.3/tests.html)
+- [Documentation technique et contrat V1.3](v1.3/README.md)
+- [Moteur JavaScript V1.3](v1.3/diagcore.js)
+- [Feuille CSS V1.3](v1.3/diagcore.css)
+- [Démonstrateur V1.3](v1.3/demo.html)
+- [Tests automatisés V1.3](v1.3/tests.html)
 
-La syntaxe et huit tests comportementaux ont été vérifiés dans un environnement DOM simulé. La recette finale sur navigateurs PC et smartphone ainsi que l'intégration dans les cours restent à effectuer.
+### Intégration recommandée
 
-## Version 1.2.2 : résultats de Mon diagnostic
-
-Les résultats des hypothèses utilisent désormais les couleurs de QCMCore : bordure verte `#00d958` si l'hypothèse est validée et orange `#ff9900` si elle est erronée ou prématurée. Les fonds sont foncés pour assurer une lecture en blanc dans les thèmes clair et sombre. Le style est appliqué uniquement aux entrées de la phase `hypotheses` via les classes `diagcore__entry--hypothesis-correct` et `diagcore__entry--hypothesis-wrong`. Observations, corrections, retests, historique et validation restent inchangés. La famille `1.2.` est conservée pour la compatibilité avec Messagerie.
-
-## Version 1.2.1 : navigation libre (mode vertical)
-
-- La version autonome a été réalignée sur la copie des portails pour conserver `groupPicker`, `hideHypothesisUntilReady`, le sélecteur de catégories et les styles associés.
-- Un contrôle déjà consulté reste cliquable et peut afficher à nouveau son observation. Les catégories entièrement consultées restent actives.
-- Un bouton consulté est identifié par `.diagcore__choice--visited` (bleu clair, y compris en mode sombre).
-- `state.done` demeure un ensemble d'identifiants distincts : les répétitions ne gonflent pas `minimumChecks`, `requiredChecks` ni `getCompleted()`.
-- Chaque ouverture d'une observation ajoute une nouvelle entrée dans `getHistory()`. `restart()` efface historique, contrôles distincts et catégorie choisie.
-- La présentation historique sans `mode:'vertical'` n'est pas modifiée.
-
-**Intégration dans les portails :** lors d'une opération distincte, remplacer ensemble `ressources/diagcore/v1/diagcore.js` et `ressources/diagcore/v1/diagcore.css` par les fichiers homologues du dépôt autonome. Actualiser si nécessaire les paramètres de cache `?v=` des deux ressources dans les cours, sans toucher aux scripts de scénario. Le numéro `1.2.1` conserve volontairement la famille `1.2.` exigée par le scénario Messagerie actuel.
-
-## Version 1.2.1 (mode vertical facultatif)
-
-- `v1/diagcore.js` : navigation, embranchements, historique, retour, redémarrage, vérification via `check()` et fin de parcours.
-- `v1/diagcore.css` : styles de DiagTree isolés et préfixés, interface responsive, thèmes clair et sombre.
-- `demo/index.html` et `demo/scenario.js` : démonstration DHCP sans simulateur ni serveur.
-
-Démonstration prévue sur GitHub Pages : https://chaoli22000bzh.github.io/diagcore/demo/
-
-**Attention :** l'URL publique nécessite l'activation préalable de GitHub Pages dans les paramètres du dépôt (source : `main`, dossier `/`).
-
-## Utilisation depuis un cours
+Charger **une seule version de DiagCore par page**, avec son CSS de la même version :
 
 ```html
-<link rel="stylesheet" href="https://chaoli22000bzh.github.io/diagcore/v1/diagcore.css">
+<link rel="stylesheet" href="https://chaoli22000bzh.github.io/DiagCore/v1.3/diagcore.css">
 <div id="mon-diagnostic"></div>
-<script src="https://chaoli22000bzh.github.io/diagcore/v1/diagcore.js"></script>
+<script src="https://chaoli22000bzh.github.io/DiagCore/v1.3/diagcore.js"></script>
 ```
 
-Puis, dans un script chargé après DiagCore :
+Puis monter le scénario depuis le JavaScript du cours :
 
 ```js
-const nodes = {
-  start: {title:'Incident',text:'Que vérifier ?',choices:[['test','Vérifier le poste']]},
-  test: {title:'Contrôle',text:'Effectue le contrôle.',check:()=>true,fail:'Contrôle manquant.',next:'done'},
-  done: {title:'Terminé',text:'Problème résolu.',complete:true}
-};
-DiagCore.mount('#mon-diagnostic',nodes,{onComplete:()=>console.log('Diagnostic terminé')});
+if (!window.DiagCore?.version?.startsWith('1.3.')) {
+  throw new Error('DiagCore V1.3 indisponible');
+}
+const instance = DiagCore.mount('#mon-diagnostic', scenario, {mode:'vertical'});
 ```
 
-Les attributs historiques de DiagTree sont conservés : `title`, `text`, `choices`, `next`, `check`, `fail`, `returnToTp`. Pour un nouveau scénario, préférer `complete:true`. Les contrôles restent des fonctions JavaScript : pas de conversion JSON obligatoire.
+**Ne jamais charger deux versions dans une même page.** Toutes exposent l'objet global `window.DiagCore` : un second chargement remplacerait la première implémentation. Ne pas mélanger non plus les feuilles CSS de versions différentes.
 
-## Thèmes et isolation
+Les scénarios, les observations, les interfaces de simulateur et les règles de validation restent propres à chaque cours. DiagCore ne dépend ni de R2D3, ni d'Outlook, ni de C².
 
-L'en-tête affiche un nom pédagogique configurable avec l'option `brand` (par exemple `brand:'Diagnostic DHCP'`). Le moteur utilise « Diagnostic » par défaut. Les règles de navigation et de progression sont inchangées.
+### Fonctionnalités principales
 
-Les styles sont préfixés `.diagcore` ou `.diagcore__...` et n'affectent pas le reste des cours. Le thème suit `prefers-color-scheme` par défaut ; l'option `theme:'light'` ou `theme:'dark'` le force. Les couleurs principales peuvent être personnalisées par les variables CSS `--dc-bg`, `--dc-surface`, `--dc-text`, `--dc-muted`, `--dc-border`, `--dc-hover`. Définir les surcharges avec une spécificité suffisante pour les thèmes automatiques.
+- Sélection de groupes et de contrôles, contrôles répétables, hypothèses et historique.
+- Interventions multiples, librement enchaînées et répétables.
+- Vérifications multiples associées aux révisions techniques pertinentes.
+- Exécution synchrone ou asynchrone et confirmation explicite d'actions réalisées dans un simulateur externe.
+- Clôture autorisée par le scénario, jamais déduite automatiquement d'un bouton d'intervention.
+- Redémarrage indépendant des simulateurs et protection contre les résultats asynchrones tardifs.
+- Affichage responsive et sous-titres facultatifs dans les boutons.
 
+### État de validation
 
-## Mode vertical optionnel (1.2.0)
+Les dix tests automatisés de la V1.3 ont réussi dans un environnement DOM simulé. Le démonstrateur a été validé lors d'un essai utilisateur. Les essais automatisés ne constituent pas à eux seuls une certification exhaustive sur tous les navigateurs ni une validation de chaque intégration avec un simulateur réel.
 
-Le mode classique reste celui par défaut. Pour activer le parcours vertical, utiliser `mode:'vertical'` avec un scénario déclarant des groupes de contrôles.
+## Politique des anciennes versions
 
-[Exemple générique vertical](https://chaoli22000bzh.github.io/diagcore/demo/vertical.html)
+Les fichiers des anciennes versions, dont `v1/` (V1.2.2), sont **conservés uniquement comme archives techniques et solution de retour arrière**.
 
-```js
-const scenario = {
-  title:'Choisis une vérification',
-  minimumChecks:1,
-  groups:[{title:'Poste',checks:[
-    {id:'ip',label:'Consulter la configuration IPv4',
-     action:'Commande : ipconfig /all',
-     observation:{type:'command',text:'IPv4 : 169.254.10.3'}}
-  ]}],
-  hypotheses:[{label:'Absence de réponse DHCP',correct:true,requiredChecks:['ip']}],
-  correction:{label:'Appliquer une correction',requiredChecks:['ip'],observation:'Correction appliquée'},
-  verification:{label:'Retester le poste',check:()=>true,observation:'Bail DHCP reçu'},
-  success:'Diagnostic terminé.'
-};
-DiagCore.mount('#diagnostic',scenario,{mode:'vertical'});
-```
+- Aucune nouvelle ressource pédagogique ne doit y faire référence.
+- Il n'est pas nécessaire de supprimer les archives pour utiliser uniquement la V1.3 dans les cours.
+- La présence d'une ancienne version dans GitHub n'entraîne pas son chargement dans les pages.
+- **Les anciennes URL peuvent encore être accessibles** tant que les fichiers restent publiés par GitHub Pages. Les supprimer pour bloquer leur accès serait une opération distincte, à décider après vérification des éventuels liens externes.
+- L'historique complet des changements reste disponible dans les commits Git et les fichiers archivés.
 
-**Contrats principaux :**
-
-- `groups[].checks[]` définit les contrôles par équipement ou catégorie. Chaque contrôle possède `id`, `label`, une éventuelle `action` et `observation`, qui peut être une valeur ou une fonction `observe({completed})`.
-- `observation` accepte du texte, `{type:'text',text}`, `{type:'command',text}`, `{type:'image',src,alt,caption}`, ou un tableau de ces blocs. Les images sont fournies par le scénario.
-- `minimumChecks` limite l'accès aux hypothèses. `hypotheses[]` définit `label`, `correct`, `requiredChecks`, `feedback`, `prematureFeedback`.
-- `correction` et `verification` sont indépendantes du DHCP. Leurs libellés et observations sont configurables. `verification.check({completed})` peut refuser une validation finale.
-- La timeline s'allonge vers le bas ; le contrôle et son résultat sont affichés ensemble. Les hypothèses erronées permettent de reprendre l'exploration.
-- `onComplete` fonctionne aussi en mode vertical. L'instance expose `restart()`, `getHistory()`, `getCompleted()`, `destroy()`.
-- Le mode vertical ne modifie ni les scénarios classiques ni les TP C².
-
-**Limites de la première extraction :** un contrôle est simulé par les observations fournies dans le scénario et est enregistré dès qu'il est sélectionné. Pour une vérification technique réelle, employer un adaptateur spécifique via `observe` et `verification.check`. Aucune commande réseau réelle n'est exécutée depuis le navigateur.
-
-## Périmètre actuel
-
-Cette première version conserve la logique pédagogique de DiagTree. Les choix exprimés par l'élève ne constituent pas, à eux seuls, des preuves : les contrôles effectifs passent par `check()`. Pas de sauvegarde de progression ni de moteur de preuve général. Les scénarios restent indépendants du moteur. Ne pas modifier les fichiers de `v1/` d'une façon incompatible avec les cours déjà publiés.
-
-Avant intégration en production, tester les parcours dans les navigateurs cibles et vérifier que GitHub Pages est activé.
+Pour tout nouveau développement, toute correction ou toute documentation opérationnelle, utiliser exclusivement le dossier [`v1.3/`](v1.3/).
